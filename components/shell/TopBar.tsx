@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 
 function Flame({ className }: { className?: string }) {
@@ -27,7 +28,16 @@ export function TopBar({
         <div className="mt-1 text-[10px] font-medium uppercase tracking-[1px] text-greyish">{unitTitle}</div>
       </div>
       <div className="flex items-center gap-2">
-        {signedIn ? <SignOutButton /> : null}
+        {signedIn ? (
+          <SignOutButton />
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-tag border-2 border-ink bg-paper px-3 py-1 font-display text-[11px] font-extrabold text-ink shadow-comic-sm"
+          >
+            Sign in
+          </Link>
+        )}
         <div className="flex items-center gap-1.5 rounded-tag bg-ink px-2.5 py-1 font-display text-xs font-bold text-paper shadow-comic-sm">
           <Flame className="h-3.5 w-3.5" />
           <span>{streak}</span>

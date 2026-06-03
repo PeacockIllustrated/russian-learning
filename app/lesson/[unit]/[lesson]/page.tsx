@@ -10,5 +10,5 @@ export default async function LessonPage({
   const { unit, lesson } = await params;
   const found = getLesson(Number(unit), Number(lesson));
   if (!found) notFound();
-  return <LessonPlayer lesson={found.lesson} backHref="/journey" />;
+  return <LessonPlayer lesson={found.lesson} unitPos={Number(unit)} lessonPos={Number(lesson)} backHref="/journey" />;
 }

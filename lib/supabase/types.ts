@@ -124,6 +124,12 @@ export type Database = {
         Update: { owner?: string; glyph?: string; reactivated?: boolean; reviewed_at?: string | null };
         Relationships: [];
       };
+      russ_lesson_progress: {
+        Row: { owner: string; unit_position: number; lesson_position: number; score: number | null; completed_at: string };
+        Insert: { owner: string; unit_position: number; lesson_position: number; score?: number | null; completed_at?: string };
+        Update: { owner?: string; unit_position?: number; lesson_position?: number; score?: number | null; completed_at?: string };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

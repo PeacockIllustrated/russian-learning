@@ -145,6 +145,16 @@ create table russ_letter_progress (
   primary key (owner, glyph)
 );
 
+-- per user lesson completion against the static curriculum, keyed by position
+create table russ_lesson_progress (
+  owner uuid not null references auth.users on delete cascade,
+  unit_position int not null,
+  lesson_position int not null,
+  score int,
+  completed_at timestamptz not null default now(),
+  primary key (owner, unit_position, lesson_position)
+);
+
 -- enable RLS on everything
 alter table russ_profiles enable row level security;
 alter table russ_units enable row level security;
@@ -158,6 +168,7 @@ alter table russ_scores enable row level security;
 alter table russ_comprehension_attempts enable row level security;
 alter table russ_sessions enable row level security;
 alter table russ_letter_progress enable row level security;
+alter table russ_lesson_progress enable row level security;
 
 -- owner only policies. profiles keys on id, the rest on owner.
 create policy "own profile" on russ_profiles
@@ -184,6 +195,8 @@ create policy "own comprehension" on russ_comprehension_attempts
 create policy "own sessions" on russ_sessions
   for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own letter_progress" on russ_letter_progress
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
+create policy "own lesson_progress" on russ_lesson_progress
   for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 
 -- helpful indexes

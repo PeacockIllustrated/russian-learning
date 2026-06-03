@@ -5,12 +5,13 @@ import { cyrillicLetters, letterGroups, lettersByGroup, letterCount } from "@/li
 import { FeaturedCard } from "@/components/alphabet/FeaturedCard";
 import { Tag } from "@/components/ui/Tag";
 import { cn } from "@/lib/utils/cn";
+import { reactivateLetter } from "@/lib/progress/actions";
 import type { CyrillicLetter } from "@/lib/content/types";
 
-// reactivation is local only this phase; russ_letter_progress persists it in phase 1.
-export function AlphabetBoard() {
+// reactivation persists to russ_letter_progress when signed in, local otherwise.
+export function AlphabetBoard({ initialReactivated = [] }: { initialReactivated?: string[] }) {
   const [selected, setSelected] = useState<CyrillicLetter>(cyrillicLetters[0]);
-  const [reactivated, setReactivated] = useState<Set<string>>(new Set());
+  const [reactivated, setReactivated] = useState<Set<string>>(() => new Set(initialReactivated));
   const [pulsing, setPulsing] = useState<string | null>(null);
 
   function select(letter: CyrillicLetter) {
@@ -18,6 +19,7 @@ export function AlphabetBoard() {
     if (!reactivated.has(letter.upper)) {
       setReactivated((prev) => new Set(prev).add(letter.upper));
       setPulsing(letter.upper); // the one earned, live vermilion moment on this screen
+      void reactivateLetter(letter.upper);
     }
   }
 

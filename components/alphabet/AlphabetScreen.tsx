@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/cn";
 import { AlphabetBoard } from "@/components/alphabet/AlphabetBoard";
 import { AlphabetPractice } from "@/components/alphabet/AlphabetPractice";
 
-export function AlphabetScreen() {
+export function AlphabetScreen({ initialReactivated = [] }: { initialReactivated?: string[] }) {
   const [mode, setMode] = useState<"learn" | "practice">("learn");
 
   return (
@@ -26,7 +26,7 @@ export function AlphabetScreen() {
         </Seg>
       </div>
 
-      {mode === "learn" ? <AlphabetBoard /> : <AlphabetPractice />}
+      {mode === "learn" ? <AlphabetBoard initialReactivated={initialReactivated} /> : <AlphabetPractice />}
     </div>
   );
 }

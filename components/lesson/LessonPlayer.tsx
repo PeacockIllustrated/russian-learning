@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { speak } from "@/lib/audio/tts";
+import { saveLessonProgress } from "@/lib/progress/actions";
 import type { Lesson, LessonPhrase, LessonComprehension } from "@/lib/content/types";
 
 type Phase =
@@ -12,7 +13,17 @@ type Phase =
   | { kind: "comp"; i: number }
   | { kind: "done" };
 
-export function LessonPlayer({ lesson, backHref = "/journey" }: { lesson: Lesson; backHref?: string }) {
+export function LessonPlayer({
+  lesson,
+  unitPos,
+  lessonPos,
+  backHref = "/journey",
+}: {
+  lesson: Lesson;
+  unitPos: number;
+  lessonPos: number;
+  backHref?: string;
+}) {
   const phrases = lesson.phrases;
   const comps = lesson.comprehension;
 
@@ -20,6 +31,16 @@ export function LessonPlayer({ lesson, backHref = "/journey" }: { lesson: Lesson
   const [correct, setCorrect] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
+
+  // save completion once we reach the end, only persists when signed in
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (phase.kind === "done" && !savedRef.current) {
+      savedRef.current = true;
+      const score = comps.length ? Math.round((correct / comps.length) * 100) : null;
+      void saveLessonProgress(unitPos, lessonPos, score);
+    }
+  }, [phase, correct, comps.length, unitPos, lessonPos]);
 
   const totalSteps = phrases.length + comps.length || 1;
   const stepIndex =
