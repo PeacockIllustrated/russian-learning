@@ -55,3 +55,37 @@ export interface SeedLesson {
   phrases: SeedPhrase[];
   comprehension: SeedComprehension[];
 }
+
+// authored curriculum content, the source the lesson player reads from
+export interface LessonPhrase {
+  cyrillic: string; // stress marked where it is not obvious
+  translit: string;
+  gloss: string;
+  note?: string; // a short, concrete grammar note about this phrase
+}
+
+export interface LessonComprehension {
+  audio: string; // the Russian the learner hears
+  prompt: string;
+  options: string[];
+  answer: number; // index of the correct option
+}
+
+export interface Lesson {
+  position: number;
+  title: string;
+  scenario: string;
+  grammar: { title: string; note: string };
+  newWords: string[]; // lemmas introduced, shown on the intro
+  phrases: LessonPhrase[];
+  comprehension: LessonComprehension[];
+}
+
+export interface CurriculumUnit {
+  position: number;
+  title: string;
+  domain: string;
+  level: Level;
+  summary: string;
+  lessons: Lesson[]; // empty until authored or generated
+}

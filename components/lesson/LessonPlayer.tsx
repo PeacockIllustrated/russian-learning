@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { speak } from "@/lib/audio/tts";
-import type { SeedLesson, SeedPhrase, SeedComprehension } from "@/lib/content/types";
+import type { Lesson, LessonPhrase, LessonComprehension } from "@/lib/content/types";
 
 type Phase =
   | { kind: "intro" }
@@ -12,7 +12,7 @@ type Phase =
   | { kind: "comp"; i: number }
   | { kind: "done" };
 
-export function LessonPlayer({ lesson }: { lesson: SeedLesson }) {
+export function LessonPlayer({ lesson, backHref = "/journey" }: { lesson: Lesson; backHref?: string }) {
   const phrases = lesson.phrases;
   const comps = lesson.comprehension;
 
@@ -48,19 +48,19 @@ export function LessonPlayer({ lesson }: { lesson: SeedLesson }) {
     setPhase({ kind: "comp", i });
   }
   function nextComp(i: number) {
-    if (checked && selected === comps[i].answer_index) setCorrect((c) => c + 1);
+    if (checked && selected === comps[i].answer) setCorrect((c) => c + 1);
     if (i + 1 < comps.length) goComp(i + 1);
     else setPhase({ kind: "done" });
   }
 
   const currentComp = phase.kind === "comp" ? comps[phase.i] : null;
-  const isCorrect = currentComp != null && checked && selected === currentComp.answer_index;
+  const isCorrect = currentComp != null && checked && selected === currentComp.answer;
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col overflow-hidden bg-paper">
       <header className="flex shrink-0 items-center gap-3 px-4 pb-2 pt-4">
         <Link
-          href="/journey"
+          href={backHref}
           aria-label="Close lesson"
           className="grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper text-ink active:translate-x-[1px] active:translate-y-[1px]"
         >
@@ -86,7 +86,7 @@ export function LessonPlayer({ lesson }: { lesson: SeedLesson }) {
             onSelect={(idx) => !checked && setSelected(idx)}
           />
         )}
-        {phase.kind === "done" && <Done correct={correct} total={comps.length} />}
+        {phase.kind === "done" && <Done correct={correct} total={comps.length} backHref={backHref} />}
       </main>
 
       <footer className="shrink-0 px-4 pb-5 pt-2">
@@ -113,7 +113,7 @@ export function LessonPlayer({ lesson }: { lesson: SeedLesson }) {
         )}
         {phase.kind === "done" && (
           <Link
-            href="/journey"
+            href={backHref}
             className="block w-full rounded-[13px] border-[3px] border-ink bg-ink px-4 py-3 text-center font-display text-[13px] font-extrabold text-paper shadow-comic-sm transition active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
             Continue the journey
@@ -159,8 +159,7 @@ function PlayIcon({ className }: { className?: string }) {
   );
 }
 
-function Intro({ lesson }: { lesson: SeedLesson }) {
-  const newWords = lesson.phrases.flatMap((p) => p.new_vocabulary.map((v) => v.lemma));
+function Intro({ lesson }: { lesson: Lesson }) {
   return (
     <div className="pt-2">
       <span className="inline-block rounded-tag border-2 border-ink px-2.5 py-1 text-[9px] font-bold uppercase tracking-[1.4px]">
@@ -169,8 +168,8 @@ function Intro({ lesson }: { lesson: SeedLesson }) {
       <h1 className="mt-3 font-display text-xl font-extrabold">{lesson.title}</h1>
       <p className="mt-1 text-xs text-greyish">{lesson.scenario}</p>
       <div className="mt-5 space-y-2.5">
-        <Row icon={<span className="font-display text-[13px] font-extrabold">RU</span>} title={`${newWords.length} new words`} sub={newWords.join(", ")} />
-        <Row icon={<span className="font-display text-[13px] font-extrabold">Aa</span>} title="Grammar" sub={lesson.grammar_focus.title} />
+        <Row icon={<span className="font-display text-[13px] font-extrabold">RU</span>} title={`${lesson.newWords.length} new words`} sub={lesson.newWords.join(", ")} />
+        <Row icon={<span className="font-display text-[13px] font-extrabold">Aa</span>} title="Grammar" sub={lesson.grammar.title} />
         <Row icon={<PlayIcon className="h-4 w-4" />} title="Listening" sub={`${lesson.comprehension.length} checks`} />
       </div>
     </div>
@@ -189,7 +188,7 @@ function Row({ icon, title, sub }: { icon: ReactNode; title: string; sub: string
   );
 }
 
-function PhraseStep({ phrase, index, total }: { phrase: SeedPhrase; index: number; total: number }) {
+function PhraseStep({ phrase, index, total }: { phrase: LessonPhrase; index: number; total: number }) {
   return (
     <div className="pt-2">
       <div className="mb-3 text-[10px] font-bold uppercase tracking-[1.4px] text-greyish">
@@ -197,8 +196,8 @@ function PhraseStep({ phrase, index, total }: { phrase: SeedPhrase; index: numbe
       </div>
       <div className="rounded-[18px] border-[3px] border-ink bg-paper bg-halftone bg-dots-lg p-5 text-center shadow-comic">
         <div className="font-display text-[26px] font-extrabold leading-tight">{phrase.cyrillic}</div>
-        {phrase.transliteration ? (
-          <div className="mt-2 text-[12px] italic text-greyish">{phrase.transliteration}</div>
+        {phrase.translit ? (
+          <div className="mt-2 text-[12px] italic text-greyish">{phrase.translit}</div>
         ) : null}
         <div className="mt-1 text-[13px] font-semibold">{phrase.gloss}</div>
       </div>
@@ -210,13 +209,13 @@ function PhraseStep({ phrase, index, total }: { phrase: SeedPhrase; index: numbe
         <PlayIcon className="h-4 w-4" />
         Listen
       </button>
-      {phrase.grammar_note ? (
+      {phrase.note ? (
         <div className="mt-4 rounded-[12px] border-2 border-dashed border-ink bg-paper2 px-3.5 py-3">
           <div className="mb-1.5 flex items-center gap-1.5 font-display text-[10px] font-bold uppercase tracking-[1px]">
             <span className="h-2 w-2 rotate-45 bg-ink" />
             Note
           </div>
-          <p className="text-[11.5px] leading-relaxed text-[#3c382f]">{phrase.grammar_note}</p>
+          <p className="text-[11.5px] leading-relaxed text-[#3c382f]">{phrase.note}</p>
         </div>
       ) : null}
     </div>
@@ -229,7 +228,7 @@ function CompStep({
   checked,
   onSelect,
 }: {
-  comp: SeedComprehension;
+  comp: LessonComprehension;
   selected: number | null;
   checked: boolean;
   onSelect: (i: number) => void;
@@ -242,7 +241,7 @@ function CompStep({
       </span>
       <button
         type="button"
-        onClick={() => speak(comp.audio_phrase)}
+        onClick={() => speak(comp.audio)}
         aria-label="Play audio"
         className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full border-[3px] border-ink bg-ink text-paper shadow-comic transition active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
       >
@@ -252,7 +251,7 @@ function CompStep({
       <div className="space-y-2.5">
         {comp.options.map((opt, i) => {
           const isSel = selected === i;
-          const isAnswer = i === comp.answer_index;
+          const isAnswer = i === comp.answer;
           let style = "border-ink bg-paper";
           if (checked) {
             if (isAnswer && isSel) style = "border-pop bg-paper animate-stampIn";
@@ -286,7 +285,7 @@ function CompStep({
   );
 }
 
-function Done({ correct, total }: { correct: number; total: number }) {
+function Done({ correct, total, backHref }: { correct: number; total: number; backHref: string }) {
   return (
     <div className="flex h-full min-h-[60vh] flex-col items-center justify-center text-center">
       <span className="mb-5 inline-block rounded-tag border-2 border-ink px-2.5 py-1 text-[9px] font-bold uppercase tracking-[1.4px]">
@@ -301,6 +300,9 @@ function Done({ correct, total }: { correct: number; total: number }) {
       <p className="mt-3 text-xs text-greyish">
         {total ? "listening checks correct" : "nicely worked through"}
       </p>
+      <Link href={backHref} className="sr-only">
+        Back
+      </Link>
     </div>
   );
 }

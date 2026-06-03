@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/supabase/profile";
 import { TopBar } from "@/components/shell/TopBar";
 import { BottomNav } from "@/components/shell/BottomNav";
-import { firstUnit } from "@/content/spine";
+import { firstUnit } from "@/content/curriculum";
 
 // mobile-first app shell: fixed top bar, scrollable middle, fixed bottom nav.
 // auth is optional: signed-in users get their profile, everyone else gets defaults.

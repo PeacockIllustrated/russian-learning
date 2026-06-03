@@ -9,7 +9,7 @@ export function StartBanner({ lessonTitle }: { lessonTitle: string }) {
         <div className="text-[11px] opacity-80">{lessonTitle}</div>
       </div>
       <Link
-        href="/lesson"
+        href="/lesson/1/1"
         className="rounded-[9px] border-2 border-ink bg-paper px-3.5 py-2 font-display text-[11px] font-extrabold text-ink transition active:translate-x-[2px] active:translate-y-[2px]"
       >
         Open
