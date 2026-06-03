@@ -29,14 +29,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // auth is optional for now: the app is usable without an account, sign-in only
+  // persists progress. the one redirect is to keep a signed-in user off /login.
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login");
-
-  if (!user && !isAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/journey";

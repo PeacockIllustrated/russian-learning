@@ -1,27 +1,33 @@
+import Link from "next/link";
 import { spine } from "@/content/spine";
 import { UnitNode, type NodeState } from "@/components/journey/UnitNode";
 
-// winding offsets so the path feels organic, kept inside the column width.
-// progress is stubbed honestly: unit 1 is current, the rest locked, none done.
-const OFFSETS = [88, 28, 140, 56, 150, 40, 112, 20];
+// a clean, centred, connected path. unit 1 is current and opens its lesson;
+// the rest are locked until the spine fills in. progress is stubbed honestly.
+function Connector() {
+  return (
+    <div
+      className="my-1 h-8 w-1"
+      style={{ backgroundImage: "repeating-linear-gradient(var(--ink) 0 6px, transparent 6px 12px)" }}
+      aria-hidden="true"
+    />
+  );
+}
 
 export function JourneyPath() {
   return (
-    <div className="relative pb-6 pt-1">
+    <div className="flex flex-col items-center pb-8 pt-2">
       {spine.map((unit, i) => {
         const state: NodeState = i === 0 ? "current" : "locked";
-        const offset = OFFSETS[i % OFFSETS.length];
         return (
-          <div key={unit.position}>
-            <UnitNode unit={unit} state={state} offset={offset} />
-            {i < spine.length - 1 && (
-              <div
-                className="my-1.5 h-7 w-1"
-                style={{
-                  marginLeft: offset + 30,
-                  backgroundImage: "repeating-linear-gradient(var(--ink) 0 6px, transparent 6px 12px)",
-                }}
-              />
+          <div key={unit.position} className="flex flex-col items-center">
+            {i > 0 ? <Connector /> : null}
+            {state === "current" ? (
+              <Link href="/lesson" aria-label={`Open ${unit.title}`}>
+                <UnitNode unit={unit} state={state} />
+              </Link>
+            ) : (
+              <UnitNode unit={unit} state={state} />
             )}
           </div>
         );

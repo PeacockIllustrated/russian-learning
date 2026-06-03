@@ -22,9 +22,9 @@ function Check() {
 
 // done is inverted ink, current bobs with the double ring, locked is dashed grey.
 // no vermilion at rest; the completion pulse fires only when a node is finished.
-export function UnitNode({ unit, state, offset }: { unit: SpineUnit; state: NodeState; offset: number }) {
+export function UnitNode({ unit, state }: { unit: SpineUnit; state: NodeState }) {
   return (
-    <div className="flex w-16 flex-col items-center" style={{ marginLeft: offset }}>
+    <div className="flex flex-col items-center">
       <div
         className={cn(
           "grid h-16 w-16 place-items-center rounded-full border-[3px] border-ink font-display text-xl font-extrabold",
