@@ -161,33 +161,51 @@ alter table russ_letter_progress enable row level security;
 
 -- owner only policies. profiles keys on id, the rest on owner.
 create policy "own profile" on russ_profiles
-  for all using (auth.uid() = id) with check (auth.uid() = id);
+  for all using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
 
 create policy "own units" on russ_units
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own lessons" on russ_lessons
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own phrases" on russ_phrases
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own vocabulary" on russ_vocabulary
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own vocab_cases" on russ_vocab_cases
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own srs_cards" on russ_srs_cards
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own recordings" on russ_recordings
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own scores" on russ_scores
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own comprehension" on russ_comprehension_attempts
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own sessions" on russ_sessions
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 create policy "own letter_progress" on russ_letter_progress
-  for all using (auth.uid() = owner) with check (auth.uid() = owner);
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
 
 -- helpful indexes
 create index on russ_lessons (owner, unit_id, position);
 create index on russ_phrases (owner, lesson_id, position);
 create index on russ_srs_cards (owner, due_at);
 create index on russ_sessions (owner, completed_at);
+
+-- foreign key indexes, so cascades and joins stay cheap as data grows
+create index on russ_units (owner);
+create index on russ_lessons (unit_id);
+create index on russ_phrases (lesson_id);
+create index on russ_vocabulary (owner);
+create index on russ_vocabulary (lesson_id);
+create index on russ_vocab_cases (owner);
+create index on russ_vocab_cases (vocab_id);
+create index on russ_srs_cards (vocab_id);
+create index on russ_srs_cards (phrase_id);
+create index on russ_recordings (owner);
+create index on russ_recordings (phrase_id);
+create index on russ_scores (owner);
+create index on russ_scores (recording_id);
+create index on russ_comprehension_attempts (owner);
+create index on russ_comprehension_attempts (lesson_id);
+create index on russ_sessions (lesson_id);
