@@ -1,10 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { RegisterSW } from "@/components/pwa/RegisterSW";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Russian learning",
-  description: "A personal app for learning conversational Russian.",
+  applicationName: "учим russian",
+  title: "учим russian",
+  description: "Learn conversational Russian, the comic way.",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "учим" },
+  icons: { icon: "/icon-192.png", apple: "/apple-icon-180.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f3ede0",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -19,6 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
         />
         {children}
+        <RegisterSW />
       </body>
     </html>
   );
