@@ -10,7 +10,7 @@ type Item = { key: string; label: string; href: string | null };
 // inert until their phases land
 const items: Item[] = [
   { key: "journey", label: "Journey", href: "/journey" },
-  { key: "practice", label: "Practice", href: null },
+  { key: "practice", label: "Practice", href: "/practice" },
   { key: "alphabet", label: "Alphabet", href: "/alphabet" },
   { key: "stats", label: "Stats", href: null },
 ];
