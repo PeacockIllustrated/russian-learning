@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Russian learning app, mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16140f;
+    --paper:#f3ede0;
+    --paper2:#e7dfcd;
+    --paper3:#dcd2bb;
+    --grey:#8c867a;
+    --line:#16140f;
+    --shadow:5px 5px 0 var(--ink);
+    --shadow-sm:3px 3px 0 var(--ink);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:"Golos Text",system-ui,sans-serif;
+    background:var(--paper2);
+    background-image:
+      radial-gradient(var(--ink) 0.6px, transparent 0.7px);
+    background-size:7px 7px;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:32px 16px 56px;
+    gap:26px;
+  }
+  /* ---------- showcase chrome ---------- */
+  .masthead{text-align:center;max-width:560px;position:relative}
+  .kicker{
+    display:inline-block;font-family:"Golos Text";font-weight:700;
+    font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);padding:5px 12px;
+    transform:rotate(-1.5deg);box-shadow:var(--shadow-sm);margin-bottom:14px;
+  }
+  .masthead h1{
+    font-family:"Unbounded";font-weight:900;line-height:.96;
+    font-size:clamp(30px,7vw,52px);letter-spacing:-1px;
+    text-shadow:3px 3px 0 var(--paper3), 4px 4px 0 var(--ink);
+  }
+  .masthead p{margin-top:14px;font-size:14px;color:#4a463d;max-width:440px;margin-inline:auto;line-height:1.5}
+  .sweat{position:absolute;font-family:"Unbounded";font-weight:800}
+
+  /* ---------- phone ---------- */
+  .stage{position:relative}
+  .stage::before,.stage::after{
+    content:"";position:absolute;top:50%;width:46px;height:4px;background:var(--ink);
+    box-shadow:0 11px 0 var(--ink),0 -11px 0 var(--ink);
+  }
+  .stage::before{left:-64px;transform:translateY(-50%) rotate(8deg)}
+  .stage::after{right:-64px;transform:translateY(-50%) rotate(-8deg)}
+  .phone{
+    width:340px;height:710px;background:var(--paper);
+    border:3px solid var(--ink);border-radius:42px;
+    box-shadow:9px 9px 0 var(--ink);
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:128px;height:24px;background:var(--ink);
+    border-radius:0 0 16px 16px;z-index:40}
+  .statusbar{height:34px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 22px 4px;font-size:11px;font-weight:700;flex-shrink:0;z-index:5}
+  .statusbar .dots{display:flex;gap:3px;align-items:center}
+  .statusbar .dots i{width:5px;height:5px;background:var(--ink);border-radius:50%;display:block}
+
+  /* ---------- app top bar ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    padding:6px 18px 12px;flex-shrink:0}
+  .topbar .unit{font-family:"Unbounded";font-weight:800;font-size:13px}
+  .topbar .unit small{display:block;font-family:"Golos Text";font-weight:500;font-size:10px;
+    letter-spacing:1px;text-transform:uppercase;color:var(--grey)}
+  .streak{display:flex;align-items:center;gap:6px;background:var(--ink);color:var(--paper);
+    padding:5px 11px;border-radius:30px;font-weight:700;font-size:13px;box-shadow:var(--shadow-sm)}
+  .streak svg{width:15px;height:15px}
+
+  /* ---------- screens ---------- */
+  .screens{flex:1;position:relative;overflow:hidden}
+  .screen{position:absolute;inset:0;overflow-y:auto;padding:6px 18px 22px;
+    opacity:0;pointer-events:none;transform:translateY(8px);
+    transition:opacity .28s ease, transform .28s ease}
+  .screen.active{opacity:1;pointer-events:auto;transform:none}
+  .screen::-webkit-scrollbar{display:none}
+
+  /* ---------- JOURNEY ---------- */
+  .path{position:relative;padding:14px 0 6px}
+  .node{position:relative;width:78px;height:78px;margin:0 auto 6px;display:grid;place-items:center}
+  .node .coin{width:64px;height:64px;border:3px solid var(--ink);border-radius:50%;
+    background:var(--paper);display:grid;place-items:center;font-family:"Unbounded";
+    font-weight:800;font-size:21px;box-shadow:var(--shadow-sm);position:relative;z-index:2}
+  .node.done .coin{background:var(--ink);color:var(--paper)}
+  .node.current .coin{background:var(--paper);box-shadow:0 0 0 4px var(--paper),0 0 0 7px var(--ink),5px 5px 0 var(--ink);
+    animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-5px)}}
+  .node.locked .coin{background:var(--paper3);color:var(--grey);border-style:dashed}
+  .node .lbl{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);
+    font-size:10px;font-weight:700;white-space:nowrap;background:var(--paper);
+    padding:1px 7px;border:2px solid var(--ink);border-radius:20px;z-index:3}
+  .node.current .lbl{background:var(--ink);color:var(--paper)}
+  .connector{width:4px;height:30px;margin:0 auto;background:repeating-linear-gradient(
+    var(--ink) 0 6px, transparent 6px 12px)}
+  .n-1{margin-left:120px}.n-2{margin-left:60px}.n-3{margin-left:170px}.n-4{margin-left:90px}
+  .c-1{margin-left:150px}.c-2{margin-left:95px}.c-3{margin-left:200px}.c-4{margin-left:128px}
+  .start-banner{border:3px solid var(--ink);background:var(--ink);color:var(--paper);
+    border-radius:16px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;
+    box-shadow:var(--shadow);margin-bottom:6px;transform:rotate(-.6deg)}
+  .start-banner b{font-family:"Unbounded";font-weight:800;font-size:14px}
+  .start-banner span{font-size:11px;opacity:.8;display:block}
+  .start-banner button{font-family:"Unbounded";font-weight:800;font-size:11px;
+    background:var(--paper);color:var(--ink);border:0;padding:7px 13px;border-radius:9px;cursor:pointer}
+
+  /* ---------- PRACTICE ---------- */
+  .scene-tag{display:inline-block;font-weight:700;font-size:10px;letter-spacing:1.5px;
+    text-transform:uppercase;border:2px solid var(--ink);padding:3px 9px;border-radius:20px;margin:4px 0 14px}
+  .bubble{position:relative;background:var(--paper);border:3px solid var(--ink);
+    border-radius:18px;padding:20px 18px;box-shadow:var(--shadow);text-align:center;margin-bottom:8px;
+    background-image:radial-gradient(var(--ink) .5px,transparent .6px);background-size:9px 9px}
+  .bubble::after{content:"";position:absolute;left:38px;bottom:-15px;width:24px;height:24px;
+    background:var(--paper);border-right:3px solid var(--ink);border-bottom:3px solid var(--ink);
+    transform:rotate(55deg)}
+  .bubble .ru{font-family:"Unbounded";font-weight:800;font-size:27px;line-height:1.1;letter-spacing:-.5px}
+  .bubble .tr{font-size:12px;color:var(--grey);margin-top:8px;font-style:italic}
+  .bubble .en{font-size:13px;font-weight:600;margin-top:3px}
+  .playbtn{margin:22px auto 16px;display:flex;align-items:center;gap:9px;width:fit-content;
+    border:3px solid var(--ink);background:var(--paper);border-radius:30px;padding:9px 18px;
+    font-weight:700;font-size:13px;box-shadow:var(--shadow-sm);cursor:pointer}
+  .playbtn:active{transform:translate(3px,3px);box-shadow:none}
+  .playbtn svg{width:16px;height:16px}
+
+  .grammar{border:2px dashed var(--ink);border-radius:14px;padding:12px 14px;margin-top:6px;
+    background:var(--paper2)}
+  .grammar h4{font-family:"Unbounded";font-weight:700;font-size:11px;letter-spacing:1px;
+    text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .grammar h4::before{content:"";width:10px;height:10px;background:var(--ink);display:block;transform:rotate(45deg)}
+  .grammar p{font-size:12.5px;line-height:1.5;color:#3c382f}
+  .grammar p b{font-weight:700}
+
+  /* score reveal */
+  .scorewrap{margin-top:4px}
+  .scorecard{border:3px solid var(--ink);border-radius:16px;background:var(--paper);
+    box-shadow:var(--shadow);overflow:hidden;opacity:0;transform:translateY(10px) scale(.98);
+    transition:opacity .3s,transform .3s}
+  .scorecard.show{opacity:1;transform:none}
+  .scorehead{background:var(--ink);color:var(--paper);padding:11px 15px;display:flex;
+    justify-content:space-between;align-items:center}
+  .scorehead .ttl{font-family:"Unbounded";font-weight:700;font-size:12px;letter-spacing:.5px}
+  .scorehead .big{font-family:"Unbounded";font-weight:900;font-size:30px;line-height:1}
+  .scorehead .big small{font-size:13px;font-weight:600;opacity:.6}
+  .phon{padding:13px 15px}
+  .phon .cap{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--grey);margin-bottom:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:"Unbounded";font-weight:700;font-size:14px;border:2px solid var(--ink);
+    border-radius:9px;padding:6px 10px;position:relative}
+  .chip .pct{display:block;font-family:"Golos Text";font-weight:600;font-size:9px;text-align:center;margin-top:2px}
+  .chip.good{background:var(--ink);color:var(--paper)}
+  .chip.mid{background:var(--paper);color:var(--ink);background-image:repeating-linear-gradient(
+    -45deg,transparent 0 3px,var(--paper3) 3px 5px)}
+  .chip.low{background:var(--paper);border-style:dashed;animation:nudge 1.1s ease-in-out infinite}
+  @keyframes nudge{50%{transform:translateY(-3px) rotate(-2deg)}}
+  .verdict{padding:0 15px 14px;font-size:12.5px;line-height:1.45}
+  .verdict b{font-weight:700}
+  .retry{display:flex;gap:9px;margin-top:12px}
+  .retry button{flex:1;font-family:"Unbounded";font-weight:800;font-size:13px;
+    border:3px solid var(--ink);border-radius:12px;padding:12px;cursor:pointer;box-shadow:var(--shadow-sm)}
+  .retry .again{background:var(--paper);color:var(--ink)}
+  .retry .next{background:var(--ink);color:var(--paper)}
+  .retry button:active{transform:translate(3px,3px);box-shadow:none}
+
+  /* ---------- ALPHABET ---------- */
+  .a-head{font-family:"Unbounded";font-weight:800;font-size:18px;margin:8px 0 3px}
+  .a-sub{font-size:12px;color:var(--grey);margin-bottom:16px}
+  .letter-card{width:100%;height:200px;perspective:1000px;margin-bottom:14px;cursor:pointer}
+  .lc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .letter-card.flip .lc-inner{transform:rotateY(180deg)}
+  .lc-face{position:absolute;inset:0;backface-visibility:hidden;border:3px solid var(--ink);
+    border-radius:20px;box-shadow:var(--shadow);display:grid;place-items:center;background:var(--paper)}
+  .lc-front .glyph{font-family:"Unbounded";font-weight:900;font-size:96px;line-height:1}
+  .lc-front .hint{position:absolute;bottom:14px;font-size:11px;color:var(--grey);font-weight:600}
+  .lc-back{transform:rotateY(180deg);background:var(--ink);color:var(--paper);
+    background-image:radial-gradient(var(--paper) .6px,transparent .7px);background-size:10px 10px;flex-direction:column;gap:4px;text-align:center;padding:18px}
+  .lc-back .sound{font-family:"Unbounded";font-weight:800;font-size:34px}
+  .lc-back .like{font-size:13px;opacity:.85;line-height:1.4}
+  .a-row{display:flex;gap:9px}
+  .a-mini{flex:1;border:2px solid var(--ink);border-radius:12px;padding:10px 0;text-align:center;
+    font-family:"Unbounded";font-weight:800;font-size:22px;cursor:pointer;background:var(--paper);box-shadow:var(--shadow-sm)}
+  .a-mini.seen{background:var(--ink);color:var(--paper)}
+  .a-mini:active{transform:translate(2px,2px);box-shadow:none}
+  .a-prog{margin-top:16px;border:2px dashed var(--ink);border-radius:12px;padding:11px 13px;
+    font-size:12px;display:flex;justify-content:space-between;align-items:center;background:var(--paper2)}
+  .a-prog b{font-family:"Unbounded";font-weight:800}
+
+  /* ---------- STATS ---------- */
+  .s-head{font-family:"Unbounded";font-weight:800;font-size:18px;margin:8px 0 14px}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+  .stat{border:3px solid var(--ink);border-radius:15px;padding:13px;box-shadow:var(--shadow-sm);background:var(--paper)}
+  .stat.invert{background:var(--ink);color:var(--paper)}
+  .stat .num{font-family:"Unbounded";font-weight:900;font-size:30px;line-height:1}
+  .stat .cap{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--grey);margin-top:4px}
+  .stat.invert .cap{color:rgba(243,237,224,.6)}
+  .panel{border:3px solid var(--ink);border-radius:15px;padding:14px;box-shadow:var(--shadow-sm);
+    margin-bottom:13px;background:var(--paper)}
+  .panel h4{font-family:"Unbounded";font-weight:700;font-size:12px;letter-spacing:.5px;margin-bottom:2px}
+  .panel .pcap{font-size:10px;color:var(--grey);margin-bottom:12px}
+  .bars{display:flex;align-items:flex-end;gap:8px;height:92px}
+  .bar{flex:1;background:var(--ink);border-radius:4px 4px 0 0;position:relative;min-height:6px;
+    transition:height .6s cubic-bezier(.2,.8,.2,1)}
+  .bar:nth-child(even){background-image:repeating-linear-gradient(-45deg,
+    var(--paper) 0 2px,var(--ink) 2px 5px)}
+  .bar span{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700}
+  .bar i{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;
+    font-style:normal;color:var(--grey);font-weight:600}
+  .sounds{display:flex;flex-wrap:wrap;gap:7px}
+  .sound-pill{border:2px solid var(--ink);border-radius:20px;padding:5px 11px;font-size:12px;
+    font-weight:700;display:flex;align-items:center;gap:6px}
+  .sound-pill b{font-family:"Unbounded"}
+  .sound-pill.weak{background:var(--paper);border-style:dashed}
+  .sound-pill.strong{background:var(--ink);color:var(--paper)}
+
+  /* ---------- bottom nav ---------- */
+  .nav{flex-shrink:0;border-top:3px solid var(--ink);background:var(--paper);
+    display:flex;justify-content:space-around;padding:9px 6px 12px}
+  .nav button{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;gap:3px;color:var(--grey);font-weight:700;font-size:9.5px;
+    letter-spacing:.4px;text-transform:uppercase;padding:3px 8px;border-radius:10px}
+  .nav button svg{width:23px;height:23px;stroke:var(--grey);fill:none;stroke-width:2.4}
+  .nav button.on{color:var(--ink)}
+  .nav button.on svg{stroke:var(--ink)}
+  .nav button.on{background:var(--paper2)}
+
+  .hint-line{font-size:12px;color:#4a463d;text-align:center;max-width:330px;line-height:1.5}
+  .hint-line b{font-weight:700}
+  @media(max-width:420px){
+    .stage::before,.stage::after{display:none}
+    .phone{width:min(340px,92vw)}
+  }
+</style>
+</head>
+<body>
+
+  <div class="masthead">
+    <span class="kicker">interactive mockup</span>
+    <h1>учим<br>russian</h1>
+    <p>Monochrome comic theme, mobile-first. Tap the bottom nav to move between screens, and hit record on the practice screen to watch the score loop.</p>
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="dots"><i></i><i></i><i></i> &nbsp;100</span>
+      </div>
+
+      <div class="topbar">
+        <div class="unit">Unit 2<small>At the market</small></div>
+        <div class="streak">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4-2 5-2 8a4 4 0 008 0c0-2-1-3-1-3 2 1 3 4 3 6a8 8 0 11-16 0c0-5 5-7 8-11z"/></svg>
+          14
+        </div>
+      </div>
+
+      <div class="screens">
+
+        <!-- JOURNEY -->
+        <section class="screen active" id="s-journey">
+          <div class="start-banner">
+            <div><b>Continue lesson</b><span>Asking for the price</span></div>
+            <button onclick="go('practice')">Open</button>
+          </div>
+          <div class="path">
+            <div class="node done n-1"><div class="coin">✓</div><span class="lbl">Greetings</span></div>
+            <div class="connector c-1"></div>
+            <div class="node done n-2"><div class="coin">✓</div><span class="lbl">Numbers</span></div>
+            <div class="connector c-2"></div>
+            <div class="node current n-3" onclick="go('practice')"><div class="coin">3</div><span class="lbl">The price</span></div>
+            <div class="connector c-3"></div>
+            <div class="node locked n-4"><div class="coin">4</div><span class="lbl">Paying</span></div>
+            <div class="connector c-4"></div>
+            <div class="node locked" style="margin-left:150px"><div class="coin">5</div><span class="lbl">Small talk</span></div>
+          </div>
+        </section>
+
+        <!-- PRACTICE -->
+        <section class="screen" id="s-practice">
+          <span class="scene-tag">Say it back</span>
+          <div class="bubble">
+            <div class="ru">Сколько это стоит?</div>
+            <div class="tr">skol-ka e-ta sto-it</div>
+            <div class="en">How much does this cost?</div>
+          </div>
+          <button class="playbtn" onclick="this.style.transform='';">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Listen to native
+          </button>
+
+          <div class="grammar">
+            <h4>Grammar note</h4>
+            <p><b>Сколько</b> (how much) takes the genitive, but with <b>это</b> here it stays plain. Note the stress falls on the first syllable of <b>сто́ит</b>, not the end.</p>
+          </div>
+
+          <div class="scorewrap">
+            <div style="text-align:center;margin:18px 0 6px">
+              <button id="recBtn" class="retry next" style="width:100%;max-width:none;display:flex;align-items:center;justify-content:center;gap:9px;border-radius:14px;padding:15px" onclick="record()">
+                <svg id="recIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 003-3V6a3 3 0 00-6 0v5a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-3.1A7 7 0 0019 11z"/></svg>
+                <span id="recLbl">Hold to record</span>
+              </button>
+            </div>
+
+            <div class="scorecard" id="scoreCard">
+              <div class="scorehead">
+                <span class="ttl">Pronunciation</span>
+                <span class="big"><span id="bigScore">0</span><small>/100</small></span>
+              </div>
+              <div class="phon">
+                <div class="cap">Sound by sound</div>
+                <div class="chips">
+                  <div class="chip good">с<span class="pct">94</span></div>
+                  <div class="chip good">ко<span class="pct">88</span></div>
+                  <div class="chip mid">ль<span class="pct">71</span></div>
+                  <div class="chip good">ко<span class="pct">90</span></div>
+                  <div class="chip good">э<span class="pct">86</span></div>
+                  <div class="chip low">сто́<span class="pct">58</span></div>
+                  <div class="chip good">ит<span class="pct">83</span></div>
+                </div>
+              </div>
+              <div class="verdict">
+                The stressed <b>о</b> in <b>сто́ит</b> is the one dragging the score. It is drifting short. Listen again and hold it open.
+              </div>
+              <div class="retry" style="padding:0 15px 15px">
+                <button class="again" onclick="resetScore()">Try again</button>
+                <button class="next" onclick="go('stats')">Looks good</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ALPHABET -->
+        <section class="screen" id="s-alpha">
+          <div class="a-head">Cyrillic refresher</div>
+          <div class="a-sub">Tap the card to flip. You have seen these before.</div>
+          <div class="letter-card" id="lcard" onclick="this.classList.toggle('flip')">
+            <div class="lc-inner">
+              <div class="lc-face lc-front">
+                <span class="glyph">Я</span>
+                <span class="hint">tap to reveal</span>
+              </div>
+              <div class="lc-face lc-back">
+                <span class="sound">ya</span>
+                <span class="like">like the <b>ya</b> in <b>yard</b></span>
+              </div>
+            </div>
+          </div>
+          <div class="a-row" style="margin-bottom:9px">
+            <div class="a-mini seen" onclick="this.classList.toggle('seen')">Ж</div>
+            <div class="a-mini seen" onclick="this.classList.toggle('seen')">Ц</div>
+            <div class="a-mini" onclick="this.classList.toggle('seen')">Щ</div>
+            <div class="a-mini" onclick="this.classList.toggle('seen')">Ы</div>
+          </div>
+          <div class="a-row">
+            <div class="a-mini seen" onclick="this.classList.toggle('seen')">Ч</div>
+            <div class="a-mini" onclick="this.classList.toggle('seen')">Ю</div>
+            <div class="a-mini" onclick="this.classList.toggle('seen')">Э</div>
+            <div class="a-mini" onclick="this.classList.toggle('seen')">Ё</div>
+          </div>
+          <div class="a-prog"><span>Letters reactivated</span><b>21 / 33</b></div>
+        </section>
+
+        <!-- STATS -->
+        <section class="screen" id="s-stats">
+          <div class="s-head">Your progress</div>
+          <div class="stat-grid">
+            <div class="stat invert"><div class="num">14</div><div class="cap">day streak</div></div>
+            <div class="stat"><div class="num">312</div><div class="cap">words seen</div></div>
+            <div class="stat"><div class="num">78</div><div class="cap">avg pronunciation</div></div>
+            <div class="stat"><div class="num">91%</div><div class="cap">retention</div></div>
+          </div>
+          <div class="panel">
+            <h4>Pronunciation trend</h4>
+            <div class="pcap">Last seven sessions, out of 100</div>
+            <div class="bars" id="bars">
+              <div class="bar" data-h="52"><span>52</span><i>M</i></div>
+              <div class="bar" data-h="58"><span>58</span><i>T</i></div>
+              <div class="bar" data-h="55"><span>55</span><i>W</i></div>
+              <div class="bar" data-h="64"><span>64</span><i>T</i></div>
+              <div class="bar" data-h="70"><span>70</span><i>F</i></div>
+              <div class="bar" data-h="74"><span>74</span><i>S</i></div>
+              <div class="bar" data-h="78"><span>78</span><i>S</i></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h4>Sounds to work on</h4>
+            <div class="pcap">Pulled from your weakest phonemes</div>
+            <div class="sounds">
+              <div class="sound-pill weak">stressed <b>о</b></div>
+              <div class="sound-pill weak">soft <b>ль</b></div>
+              <div class="sound-pill strong">rolled <b>р</b></div>
+              <div class="sound-pill strong"><b>ж</b></div>
+              <div class="sound-pill strong"><b>ы</b></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <nav class="nav">
+        <button class="on" data-t="journey" onclick="go('journey')">
+          <svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8M6 10v10h12V10"/></svg>Journey
+        </button>
+        <button data-t="practice" onclick="go('practice')">
+          <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM6 12a6 6 0 0012 0M12 18v3"/></svg>Practice
+        </button>
+        <button data-t="alpha" onclick="go('alpha')">
+          <svg viewBox="0 0 24 24"><path d="M5 19l4-12 4 12M6 15h6M16 7v12M16 7h3a3 3 0 010 6h-3"/></svg>Alphabet
+        </button>
+        <button data-t="stats" onclick="go('stats')">
+          <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <p class="hint-line">Strictly monochrome, ink on paper. The black panels do the work that colour usually does. The record loop is faked here, but it mirrors the <b>V2</b> per-phoneme score from the brief.</p>
+
+<script>
+  const screens={journey:'s-journey',practice:'s-practice',alpha:'s-alpha',stats:'s-stats'};
+  function go(t){
+    Object.values(screens).forEach(id=>document.getElementById(id).classList.remove('active'));
+    document.getElementById(screens[t]).classList.add('active');
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+    if(t==='stats')setTimeout(drawBars,120);
+    if(t!=='practice')resetScore();
+  }
+  function drawBars(){document.querySelectorAll('#bars .bar').forEach(b=>b.style.height=b.dataset.h+'%')}
+
+  let recording=false;
+  function record(){
+    if(recording)return;
+    const lbl=document.getElementById('recLbl'),btn=document.getElementById('recBtn');
+    recording=true;lbl.textContent='Listening…';btn.style.animation='nudge .5s ease-in-out infinite';
+    setTimeout(()=>{
+      btn.style.animation='';lbl.textContent='Recorded';recording=false;
+      const card=document.getElementById('scoreCard');card.classList.add('show');
+      let n=0;const target=78;const t=setInterval(()=>{
+        n+=4;if(n>=target){n=target;clearInterval(t)}
+        document.getElementById('bigScore').textContent=n;
+      },28);
+    },1200);
+  }
+  function resetScore(){
+    const card=document.getElementById('scoreCard');card.classList.remove('show');
+    document.getElementById('bigScore').textContent='0';
+    document.getElementById('recLbl').textContent='Hold to record';
+  }
+</script>
+</body>
+</html>

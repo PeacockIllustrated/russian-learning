@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Russian learning app, screen gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16140f;--paper:#f3ede0;--paper2:#e7dfcd;--paper3:#dcd2bb;--grey:#8c867a;
+    --shadow:5px 5px 0 var(--ink);--shadow-sm:3px 3px 0 var(--ink);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:"Golos Text",system-ui,sans-serif;background:var(--paper2);
+    background-image:radial-gradient(var(--ink) .6px,transparent .7px);background-size:7px 7px;
+    color:var(--ink);padding:38px 18px 70px;
+  }
+  /* masthead */
+  .masthead{text-align:center;max-width:680px;margin:0 auto 14px}
+  .kicker{display:inline-block;font-weight:700;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);padding:5px 12px;transform:rotate(-1.5deg);box-shadow:var(--shadow-sm);margin-bottom:16px}
+  .masthead h1{font-family:"Unbounded";font-weight:900;line-height:.95;font-size:clamp(32px,6vw,58px);
+    letter-spacing:-1.5px;text-shadow:3px 3px 0 var(--paper3),4px 4px 0 var(--ink)}
+  .masthead p{margin-top:14px;font-size:14px;color:#4a463d;max-width:540px;margin-inline:auto;line-height:1.55}
+
+  /* section divider */
+  .divider{max-width:1240px;margin:46px auto 8px;display:flex;align-items:center;gap:14px}
+  .divider .tag{font-family:"Unbounded";font-weight:800;font-size:15px;background:var(--ink);color:var(--paper);
+    padding:8px 16px;border-radius:11px;box-shadow:var(--shadow-sm);white-space:nowrap;transform:rotate(-.8deg)}
+  .divider .rule{flex:1;height:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 9px,transparent 9px 16px)}
+
+  /* gallery grid */
+  .grid{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px 30px;justify-content:center;align-items:flex-start}
+  .cell{width:300px}
+  .cap{font-weight:700;font-size:11px;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .cap b{font-family:"Unbounded";font-weight:800;background:var(--paper);border:2px solid var(--ink);
+    border-radius:7px;padding:2px 7px;font-size:11px}
+  .cap span{color:var(--grey);font-weight:600}
+
+  /* phone */
+  .phone{width:300px;height:632px;background:var(--paper);border:3px solid var(--ink);border-radius:38px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:112px;height:21px;
+    background:var(--ink);border-radius:0 0 14px 14px;z-index:40}
+  .sb{height:30px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 3px;font-size:10px;font-weight:700;flex-shrink:0}
+  .sb i{width:4px;height:4px;background:var(--ink);border-radius:50%;display:inline-block;margin-left:2px}
+  .body{flex:1;overflow:hidden;padding:6px 16px 14px;display:flex;flex-direction:column}
+  .scroll{overflow-y:auto}.scroll::-webkit-scrollbar{display:none}
+
+  /* shared app bits */
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:2px 0 12px;flex-shrink:0}
+  .appbar .u{font-family:"Unbounded";font-weight:800;font-size:13px}
+  .appbar .u small{display:block;font-weight:500;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--grey);font-family:"Golos Text"}
+  .streak{display:flex;align-items:center;gap:5px;background:var(--ink);color:var(--paper);padding:4px 10px;border-radius:30px;font-weight:700;font-size:12px;box-shadow:var(--shadow-sm)}
+  .streak svg{width:13px;height:13px}
+  .nav{flex-shrink:0;border-top:3px solid var(--ink);display:flex;justify-content:space-around;padding:8px 4px 4px;margin:auto -16px -14px;background:var(--paper)}
+  .nav b{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--grey);font-weight:700;font-size:9px;letter-spacing:.3px;text-transform:uppercase}
+  .nav svg{width:21px;height:21px;stroke:var(--grey);fill:none;stroke-width:2.4}
+  .nav b.on{color:var(--ink)}.nav b.on svg{stroke:var(--ink)}
+
+  .h{font-family:"Unbounded";font-weight:800;font-size:17px;margin:4px 0 3px}
+  .sub{font-size:11.5px;color:var(--grey);margin-bottom:14px;line-height:1.4}
+  .tag2{display:inline-block;font-weight:700;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;border:2px solid var(--ink);padding:3px 8px;border-radius:20px;margin-bottom:12px}
+
+  .btn{font-family:"Unbounded";font-weight:800;font-size:13px;border:3px solid var(--ink);border-radius:13px;
+    padding:13px;cursor:pointer;box-shadow:var(--shadow-sm);text-align:center;width:100%;background:var(--ink);color:var(--paper)}
+  .btn.ghost{background:var(--paper);color:var(--ink)}
+  .btn:active{transform:translate(3px,3px);box-shadow:none}
+
+  .opt{border:3px solid var(--ink);border-radius:13px;padding:13px 15px;margin-bottom:10px;font-weight:600;
+    font-size:14px;background:var(--paper);box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:11px;cursor:pointer}
+  .opt:active{transform:translate(3px,3px);box-shadow:none}
+  .opt.sel{background:var(--ink);color:var(--paper)}
+  .opt .k{font-family:"Unbounded";font-weight:800;width:24px;height:24px;border:2px solid currentColor;border-radius:7px;display:grid;place-items:center;font-size:12px;flex-shrink:0}
+
+  .bubble{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:18px 15px;
+    box-shadow:var(--shadow);text-align:center;background-image:radial-gradient(var(--ink) .5px,transparent .6px);background-size:9px 9px}
+  .bubble .ru{font-family:"Unbounded";font-weight:800;font-size:23px;line-height:1.12;letter-spacing:-.4px}
+  .bubble .tr{font-size:11px;color:var(--grey);margin-top:7px;font-style:italic}
+  .bubble .en{font-size:12px;font-weight:600;margin-top:3px}
+
+  .grammar{border:2px dashed var(--ink);border-radius:12px;padding:11px 12px;background:var(--paper2);margin-top:12px}
+  .grammar h4{font-family:"Unbounded";font-weight:700;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .grammar h4::before{content:"";width:9px;height:9px;background:var(--ink);transform:rotate(45deg)}
+  .grammar p{font-size:11.5px;line-height:1.5;color:#3c382f}.grammar p b{font-weight:700}
+
+  /* chips / scores */
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:"Unbounded";font-weight:700;font-size:13px;border:2px solid var(--ink);border-radius:8px;padding:5px 9px;text-align:center}
+  .chip .p{display:block;font-family:"Golos Text";font-weight:600;font-size:8px;margin-top:1px}
+  .chip.good{background:var(--ink);color:var(--paper)}
+  .chip.mid{background-image:repeating-linear-gradient(-45deg,transparent 0 3px,var(--paper3) 3px 5px)}
+  .chip.low{border-style:dashed}
+
+  /* tiles (word bank) */
+  .sentence{border-bottom:3px dashed var(--ink);min-height:46px;display:flex;flex-wrap:wrap;gap:6px;padding:8px 2px;margin-bottom:18px;align-content:flex-start}
+  .tile{font-family:"Unbounded";font-weight:700;font-size:13px;border:2px solid var(--ink);border-radius:9px;
+    padding:7px 11px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
+  .tile.placed{background:var(--ink);color:var(--paper)}
+  .bank{display:flex;flex-wrap:wrap;gap:8px}
+
+  /* match */
+  .match{display:flex;gap:10px}
+  .match .col{flex:1;display:flex;flex-direction:column;gap:9px}
+  .mrow{border:2px solid var(--ink);border-radius:10px;padding:11px 8px;text-align:center;font-weight:700;font-size:13px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
+  .mrow.ru{font-family:"Unbounded"}
+  .mrow.lit{background:var(--ink);color:var(--paper)}
+
+  /* flashcard */
+  .fc{width:100%;height:230px;perspective:1000px;cursor:pointer;margin-bottom:14px}
+  .fci{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .fc.flip .fci{transform:rotateY(180deg)}
+  .fcf{position:absolute;inset:0;backface-visibility:hidden;border:3px solid var(--ink);border-radius:18px;
+    box-shadow:var(--shadow);display:grid;place-items:center;background:var(--paper);text-align:center;padding:18px}
+  .fcf .ru{font-family:"Unbounded";font-weight:900;font-size:40px}
+  .fcf .hint{position:absolute;bottom:14px;font-size:10px;color:var(--grey);font-weight:600}
+  .fcb{transform:rotateY(180deg);background:var(--ink);color:var(--paper);flex-direction:column;gap:6px;
+    background-image:radial-gradient(var(--paper) .6px,transparent .7px);background-size:10px 10px}
+  .fcb .en{font-family:"Unbounded";font-weight:800;font-size:26px}
+  .fcb .ex{font-size:11px;opacity:.85;line-height:1.4}
+
+  /* progress dots */
+  .pdots{display:flex;gap:4px;margin-bottom:14px}
+  .pdots i{height:6px;flex:1;background:var(--paper3);border-radius:3px}
+  .pdots i.on{background:var(--ink)}
+
+  /* table */
+  .ctable{border:3px solid var(--ink);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .ctable .r{display:flex;border-bottom:2px solid var(--ink);font-size:11.5px}
+  .ctable .r:last-child{border-bottom:0}
+  .ctable .r>div{padding:8px 9px}
+  .ctable .r .c1{width:42%;font-weight:600;border-right:2px solid var(--ink)}
+  .ctable .r .c2{flex:1;font-family:"Unbounded";font-weight:700}
+  .ctable .r.head{background:var(--ink);color:var(--paper)}
+  .ctable .r.head>div{font-family:"Unbounded";font-weight:700;font-size:10px;letter-spacing:.5px}
+
+  /* chat */
+  .chat{display:flex;flex-direction:column;gap:11px}
+  .msg{max-width:80%;font-size:13px;line-height:1.35;padding:10px 12px;border:2px solid var(--ink);border-radius:14px;box-shadow:2px 2px 0 var(--ink)}
+  .msg .ru{font-family:"Unbounded";font-weight:700;font-size:14px}
+  .msg .en{font-size:10px;color:var(--grey);margin-top:3px}
+  .msg.them{align-self:flex-start;background:var(--paper);border-bottom-left-radius:3px}
+  .msg.me{align-self:flex-end;background:var(--ink);color:var(--paper);border-bottom-right-radius:3px}
+  .msg.me .en{color:rgba(243,237,224,.6)}
+  .who{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .ava{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--ink);color:var(--paper);
+    display:grid;place-items:center;font-family:"Unbounded";font-weight:800;font-size:14px}
+  .suggest{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+  .sg{border:2px solid var(--ink);border-radius:20px;padding:5px 11px;font-family:"Unbounded";font-weight:700;font-size:11px;background:var(--paper)}
+
+  /* stats */
+  .statg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+  .stat{border:3px solid var(--ink);border-radius:13px;padding:11px;box-shadow:var(--shadow-sm);background:var(--paper)}
+  .stat.inv{background:var(--ink);color:var(--paper)}
+  .stat .n{font-family:"Unbounded";font-weight:900;font-size:25px;line-height:1}
+  .stat .c{font-size:9px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--grey);margin-top:3px}
+  .stat.inv .c{color:rgba(243,237,224,.6)}
+  .panel{border:3px solid var(--ink);border-radius:13px;padding:12px;box-shadow:var(--shadow-sm);margin-bottom:11px;background:var(--paper)}
+  .panel h4{font-family:"Unbounded";font-weight:700;font-size:11px;margin-bottom:2px}
+  .panel .pc{font-size:9px;color:var(--grey);margin-bottom:11px}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:78px}
+  .bar{flex:1;background:var(--ink);border-radius:3px 3px 0 0;position:relative;min-height:5px}
+  .bar:nth-child(even){background-image:repeating-linear-gradient(-45deg,var(--paper) 0 2px,var(--ink) 2px 5px)}
+  .bar span{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:700}
+  .sounds{display:flex;flex-wrap:wrap;gap:6px}
+  .sp{border:2px solid var(--ink);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
+  .sp b{font-family:"Unbounded"}
+  .sp.weak{border-style:dashed}.sp.strong{background:var(--ink);color:var(--paper)}
+
+  /* settings list */
+  .srow{display:flex;align-items:center;justify-content:space-between;border:2px solid var(--ink);border-radius:11px;
+    padding:11px 13px;margin-bottom:9px;font-weight:600;font-size:13px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
+  .toggle{width:40px;height:23px;border:2px solid var(--ink);border-radius:20px;position:relative;flex-shrink:0;background:var(--paper)}
+  .toggle.on{background:var(--ink)}
+  .toggle::after{content:"";position:absolute;top:1.5px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--ink)}
+  .toggle.on::after{left:auto;right:2px;background:var(--paper)}
+
+  /* waveform */
+  .wave{display:flex;align-items:center;gap:3px;height:64px;justify-content:center;margin:6px 0}
+  .wave i{width:5px;background:var(--ink);border-radius:3px}
+
+  /* lesson intro list */
+  .ll{display:flex;align-items:center;gap:11px;border:2px solid var(--ink);border-radius:11px;padding:10px 12px;margin-bottom:9px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
+  .ll .ic{width:30px;height:30px;border:2px solid var(--ink);border-radius:8px;display:grid;place-items:center;font-family:"Unbounded";font-weight:800;font-size:14px;flex-shrink:0}
+  .ll .tx{font-size:12.5px}.ll .tx b{font-weight:700;display:block;font-size:13px}.ll .tx small{color:var(--grey);font-size:10px}
+
+  /* big result */
+  .result-num{font-family:"Unbounded";font-weight:900;font-size:64px;line-height:.9;text-align:center;
+    text-shadow:3px 3px 0 var(--paper3)}
+  .footnote{max-width:760px;margin:40px auto 0;text-align:center;font-size:12.5px;color:#4a463d;line-height:1.6}
+  .footnote b{font-weight:700}
+</style>
+</head>
+<body>
+
+  <div class="masthead">
+    <span class="kicker">product surface, 18 screens</span>
+    <h1>учим russian</h1>
+    <p>The full app, every major use case in one monochrome comic system. Onboarding through conversation, exercises, spaced review, reference and profile. The flip cards still flip.</p>
+  </div>
+
+  <!-- ============ A ============ -->
+  <div class="divider"><span class="tag">A · Getting started</span><span class="rule"></span></div>
+  <div class="grid">
+
+    <!-- 01 onboarding -->
+    <div class="cell">
+      <div class="cap"><b>01</b><span>Onboarding, why and how much</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="h">Why are you here?</div>
+          <div class="sub">It shapes the words you see first.</div>
+          <div class="opt sel"><span class="k">✓</span>Talk with family</div>
+          <div class="opt">Travel and getting by</div>
+          <div class="opt">Reading and culture</div>
+          <div style="margin-top:auto">
+            <div class="sub" style="margin-bottom:9px">Daily target</div>
+            <div style="display:flex;gap:7px;margin-bottom:14px">
+              <div class="tile">5 min</div><div class="tile placed">10 min</div><div class="tile">15 min</div><div class="tile">20 min</div>
+            </div>
+            <div class="btn">Start the journey</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 placement -->
+    <div class="cell">
+      <div class="cap"><b>02</b><span>Quick placement check</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="pdots"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <span class="tag2">Do you know this?</span>
+          <div class="bubble" style="margin-bottom:18px"><div class="ru">Спасибо</div></div>
+          <div class="opt sel"><span class="k">✓</span>Thank you</div>
+          <div class="opt">Please</div>
+          <div class="opt">Goodbye</div>
+          <div style="margin-top:auto;display:flex;gap:9px">
+            <div class="btn ghost" style="flex:1">New to me</div>
+            <div class="btn" style="flex:1">I know it</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ B ============ -->
+  <div class="divider"><span class="tag">B · The daily loop</span><span class="rule"></span></div>
+  <div class="grid">
+
+    <!-- 03 journey -->
+    <div class="cell">
+      <div class="cap"><b>03</b><span>Journey, home</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><div class="u">Unit 2<small>At the market</small></div>
+            <div class="streak"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4-2 5-2 8a4 4 0 008 0c0-2-1-3-1-3 2 1 3 4 3 6a8 8 0 11-16 0c0-5 5-7 8-11z"/></svg>14</div></div>
+          <div class="scroll" style="flex:1">
+            <div style="border:3px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:14px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);transform:rotate(-.6deg);margin-bottom:14px">
+              <div><b style="font-family:Unbounded;font-size:13px">Continue</b><span style="font-size:10px;opacity:.75;display:block">Asking the price</span></div>
+              <div class="tile" style="background:var(--paper);box-shadow:none">Open</div>
+            </div>
+            <div style="text-align:center;position:relative">
+              <div style="margin:0 auto 22px;width:54px;height:54px;border:3px solid var(--ink);border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:Unbounded;font-weight:800;box-shadow:var(--shadow-sm);margin-left:40px">✓</div>
+              <div style="margin:0 auto 22px;width:54px;height:54px;border:3px solid var(--ink);border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:Unbounded;font-weight:800;box-shadow:var(--shadow-sm);margin-right:50px">✓</div>
+              <div style="margin:0 auto 22px;width:60px;height:60px;border:3px solid var(--ink);border-radius:50%;background:var(--paper);display:grid;place-items:center;font-family:Unbounded;font-weight:800;font-size:20px;box-shadow:0 0 0 4px var(--paper),0 0 0 7px var(--ink),5px 5px 0 var(--ink);margin-left:90px">3</div>
+              <div style="margin:0 auto 0;width:54px;height:54px;border:3px dashed var(--ink);border-radius:50%;background:var(--paper3);color:var(--grey);display:grid;place-items:center;font-family:Unbounded;font-weight:800;margin-right:30px">4</div>
+            </div>
+          </div>
+          <div class="nav">
+            <b class="on"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8M6 10v10h12V10"/></svg>Journey</b>
+            <b><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM6 12a6 6 0 0012 0"/></svg>Practice</b>
+            <b><svg viewBox="0 0 24 24"><path d="M5 19l4-12 4 12M6 15h6"/></svg>Alphabet</b>
+            <b><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 lesson intro -->
+    <div class="cell">
+      <div class="cap"><b>04</b><span>Lesson intro</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <span class="tag2">Lesson 3</span>
+          <div class="h">Asking the price</div>
+          <div class="sub">Six phrases, three new words, one grammar point.</div>
+          <div class="ll"><div class="ic">RU</div><div class="tx"><b>3 new words</b><small>сколько, стоит, рубль</small></div></div>
+          <div class="ll"><div class="ic">▦</div><div class="tx"><b>Grammar</b><small>genitive with numbers</small></div></div>
+          <div class="ll"><div class="ic">♪</div><div class="tx"><b>Listening</b><small>2 comprehension checks</small></div></div>
+          <div class="ll"><div class="ic">◉</div><div class="tx"><b>Speaking</b><small>say all six back</small></div></div>
+          <div class="btn" style="margin-top:auto">Begin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 listening -->
+    <div class="cell">
+      <div class="cap"><b>05</b><span>Listening comprehension</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="pdots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <span class="tag2">What did you hear?</span>
+          <div style="border:3px solid var(--ink);border-radius:16px;padding:24px;display:grid;place-items:center;box-shadow:var(--shadow);margin-bottom:6px;background:var(--paper)">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4v8a4.5 4.5 0 002.5-4z"/></svg></div>
+          </div>
+          <div class="sub" style="text-align:center;margin:10px 0 14px">Tap to replay, slowed</div>
+          <div class="opt"><span class="k">A</span>Where is the metro?</div>
+          <div class="opt sel"><span class="k">B</span>How much does this cost?</div>
+          <div class="opt"><span class="k">C</span>I would like a coffee.</div>
+          <div class="btn" style="margin-top:auto">Check</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 word bank -->
+    <div class="cell">
+      <div class="cap"><b>06</b><span>Build the sentence</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="pdots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <span class="tag2">Say "I want coffee"</span>
+          <div class="sentence"><span class="tile placed">Я</span><span class="tile placed">хочу</span></div>
+          <div class="sub" style="margin-bottom:8px">Tap the words in order</div>
+          <div class="bank">
+            <span class="tile">кофе</span><span class="tile">воду</span><span class="tile">спасибо</span>
+            <span class="tile">пожалуйста</span><span class="tile">где</span>
+          </div>
+          <div class="grammar" style="margin-top:14px"><h4>Note</h4><p><b>хочу</b> is "I want". The thing wanted takes the accusative, so coffee becomes <b>кофе</b> unchanged here.</p></div>
+          <div class="btn" style="margin-top:auto">Check</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 speaking + score -->
+    <div class="cell">
+      <div class="cap"><b>07</b><span>Speaking, per-phoneme score</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body scroll">
+          <span class="tag2">Say it back</span>
+          <div class="bubble" style="margin-bottom:6px"><div class="ru">Сколько это стоит?</div><div class="tr">skol-ka e-ta sto-it</div></div>
+          <div style="border:3px solid var(--ink);border-radius:14px;background:var(--paper);box-shadow:var(--shadow);overflow:hidden;margin-top:18px">
+            <div style="background:var(--ink);color:var(--paper);padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:Unbounded;font-weight:700;font-size:11px">Pronunciation</span>
+              <span style="font-family:Unbounded;font-weight:900;font-size:26px">78<small style="font-size:11px;opacity:.6">/100</small></span></div>
+            <div style="padding:12px 13px">
+              <div style="font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--grey);margin-bottom:8px">Sound by sound</div>
+              <div class="chips"><span class="chip good">с<i class="p">94</i></span><span class="chip good">ко<i class="p">88</i></span><span class="chip mid">ль<i class="p">71</i></span><span class="chip good">ко<i class="p">90</i></span><span class="chip low">сто́<i class="p">58</i></span><span class="chip good">ит<i class="p">83</i></span></div>
+            </div>
+            <p style="padding:0 13px 13px;font-size:11.5px;line-height:1.45">The stressed <b>о</b> in <b>сто́ит</b> is dragging it. Hold it open and longer.</p>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <div class="btn ghost" style="flex:1">Try again</div><div class="btn" style="flex:1">Looks good</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 fill gap -->
+    <div class="cell">
+      <div class="cap"><b>08</b><span>Fill the gap, cases</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="pdots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+          <span class="tag2">Pick the right ending</span>
+          <div class="bubble" style="margin-bottom:8px"><div class="ru" style="font-size:20px">У меня нет <span style="border-bottom:3px dashed var(--ink);padding:0 18px">&nbsp;</span></div><div class="en">I do not have money</div></div>
+          <div class="sub" style="text-align:center;margin:12px 0">"Нет" forces the genitive</div>
+          <div class="opt"><span class="k">A</span>деньги</div>
+          <div class="opt sel"><span class="k">B</span>денег</div>
+          <div class="opt"><span class="k">C</span>деньгами</div>
+          <div class="btn" style="margin-top:auto">Check</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 match -->
+    <div class="cell">
+      <div class="cap"><b>09</b><span>Match the pairs</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="pdots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <span class="tag2">Tap the matches</span>
+          <div class="match" style="margin-top:6px">
+            <div class="col">
+              <div class="mrow ru lit">да</div><div class="mrow ru">нет</div><div class="mrow ru lit">привет</div><div class="mrow ru">пока</div>
+            </div>
+            <div class="col">
+              <div class="mrow">bye</div><div class="mrow lit">yes</div><div class="mrow">no</div><div class="mrow lit">hi</div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center;margin-top:14px">2 of 4 matched</div>
+          <div class="btn" style="margin-top:auto" >Continue</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 complete -->
+    <div class="cell">
+      <div class="cap"><b>10</b><span>Lesson complete</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body" style="text-align:center">
+          <span class="tag2" style="margin:6px auto 18px">Lesson done</span>
+          <div class="result-num">87</div>
+          <div class="sub" style="margin:8px 0 20px">session score</div>
+          <div class="statg" style="text-align:left">
+            <div class="stat inv"><div class="n">6/6</div><div class="c">phrases</div></div>
+            <div class="stat"><div class="n">3</div><div class="c">new words</div></div>
+            <div class="stat"><div class="n">81</div><div class="c">avg sound</div></div>
+            <div class="stat"><div class="n">+1</div><div class="c">day streak</div></div>
+          </div>
+          <div class="btn" style="margin-top:auto">Continue the journey</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ C ============ -->
+  <div class="divider"><span class="tag">C · Memory and mastery</span><span class="rule"></span></div>
+  <div class="grid">
+
+    <!-- 11 SRS -->
+    <div class="cell">
+      <div class="cap"><b>11</b><span>Spaced review, tap to flip</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><div class="u">Daily review<small>18 cards due</small></div><div class="streak">7/18</div></div>
+          <div class="fc" onclick="this.classList.toggle('flip')">
+            <div class="fci">
+              <div class="fcf"><div class="ru">здоровье</div><span class="hint">tap to flip</span></div>
+              <div class="fcf fcb"><div class="en">health</div><div class="ex">за ваше здоровье<br>to your health</div></div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center;margin-bottom:10px">How well did you know it?</div>
+          <div style="display:flex;gap:7px">
+            <div class="btn ghost" style="flex:1;padding:10px;font-size:11px">Again</div>
+            <div class="btn ghost" style="flex:1;padding:10px;font-size:11px">Hard</div>
+            <div class="btn" style="flex:1;padding:10px;font-size:11px">Easy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12 word detail -->
+    <div class="cell">
+      <div class="cap"><b>12</b><span>Word detail and cases</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body scroll">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+            <div><div style="font-family:Unbounded;font-weight:900;font-size:30px">стол</div>
+            <div class="sub" style="margin:2px 0 0">noun, masculine · table</div></div>
+            <div style="width:38px;height:38px;border:2px solid var(--ink);border-radius:10px;display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg></div>
+          </div>
+          <div class="ctable" style="margin:10px 0 12px">
+            <div class="r head"><div class="c1">Case</div><div class="c2">Form</div></div>
+            <div class="r"><div class="c1">nominative</div><div class="c2">стол</div></div>
+            <div class="r"><div class="c1">genitive</div><div class="c2">стола</div></div>
+            <div class="r"><div class="c1">dative</div><div class="c2">столу</div></div>
+            <div class="r"><div class="c1">accusative</div><div class="c2">стол</div></div>
+            <div class="r"><div class="c1">instrumental</div><div class="c2">столом</div></div>
+            <div class="r"><div class="c1">prepositional</div><div class="c2">столе</div></div>
+          </div>
+          <div class="grammar" style="margin-top:0"><h4>In context</h4><p>книга на столе<br><span style="color:var(--grey)">the book is on the table</span></p></div>
+          <div class="btn ghost" style="margin-top:12px">In your review deck</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13 sound drill -->
+    <div class="cell">
+      <div class="cap"><b>13</b><span>Sound drill, one phoneme</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <span class="tag2">Focus, stressed о</span>
+          <div class="h">The open о</div>
+          <div class="sub">Your weakest sound this week. Stretch it, do not clip it.</div>
+          <div style="border:3px solid var(--ink);border-radius:16px;padding:16px;box-shadow:var(--shadow);background:var(--paper);text-align:center;margin-bottom:14px">
+            <div style="font-family:Unbounded;font-weight:900;font-size:34px">сто́ит</div>
+            <div class="wave"><i style="height:18px"></i><i style="height:34px"></i><i style="height:52px"></i><i style="height:60px"></i><i style="height:44px"></i><i style="height:26px"></i><i style="height:14px"></i></div>
+            <div class="sub" style="margin:0">your attempt vs native</div>
+          </div>
+          <div class="chips" style="justify-content:center;margin-bottom:14px">
+            <span class="chip mid">try 1<i class="p">58</i></span><span class="chip mid">try 2<i class="p">66</i></span><span class="chip good">try 3<i class="p">79</i></span>
+          </div>
+          <div class="btn" style="margin-top:auto">Record again</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14 trouble words -->
+    <div class="cell">
+      <div class="cap"><b>14</b><span>Trouble words</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="h">Your trouble words</div>
+          <div class="sub">Words you keep missing. They resurface sooner.</div>
+          <div class="ll"><div class="ic">!</div><div class="tx"><b>пожалуйста</b><small>missed 4 times · please</small></div></div>
+          <div class="ll"><div class="ic">!</div><div class="tx"><b>здравствуйте</b><small>missed 3 times · hello, formal</small></div></div>
+          <div class="ll"><div class="ic">!</div><div class="tx"><b>девушка</b><small>missed 3 times · young woman</small></div></div>
+          <div class="ll"><div class="ic">!</div><div class="tx"><b>сейчас</b><small>missed 2 times · now</small></div></div>
+          <div class="btn" style="margin-top:auto">Drill these 4</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ D ============ -->
+  <div class="divider"><span class="tag">D · Conversation, reference, self</span><span class="rule"></span></div>
+  <div class="grid">
+
+    <!-- 15 conversation -->
+    <div class="cell">
+      <div class="cap"><b>15</b><span>Conversation role-play</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="who"><div class="ava">Б</div><div><b style="font-family:Unbounded;font-size:13px">Бариста</b><div class="sub" style="margin:0;font-size:10px">at the coffee shop</div></div></div>
+          <div class="chat" style="flex:1">
+            <div class="msg them"><div class="ru">Здравствуйте, что желаете?</div><div class="en">Hello, what would you like?</div></div>
+            <div class="msg me"><div class="ru">Один кофе, пожалуйста.</div><div class="en">One coffee, please</div></div>
+            <div class="msg them"><div class="ru">Большой или маленький?</div><div class="en">Large or small?</div></div>
+          </div>
+          <div class="sub" style="margin:8px 0 6px">Your turn, tap to say or pick</div>
+          <div class="suggest">
+            <span class="sg">Большой</span><span class="sg">Маленький</span>
+            <span class="sg" style="background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:5px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/></svg>speak</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16 grammar ref -->
+    <div class="cell">
+      <div class="cap"><b>16</b><span>Grammar reference</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body scroll">
+          <span class="tag2">Reference</span>
+          <div class="h">The six cases</div>
+          <div class="sub">What each case is for, in one line.</div>
+          <div class="ctable">
+            <div class="r head"><div class="c1">Case</div><div class="c2" style="font-size:9px">Used for</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">именительный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">the subject</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">родительный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">of, possession, none</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">дательный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">to, giving</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">винительный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">the object</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">творительный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">by, with</div></div>
+            <div class="r"><div class="c1" style="font-family:Unbounded;font-size:12px">предложный</div><div class="c2" style="font-family:Golos Text;font-weight:500;font-size:10.5px">about, location</div></div>
+          </div>
+          <div class="grammar" style="margin-top:12px"><h4>Why it matters</h4><p>Endings carry the meaning English gets from word order. Get the case, and people understand you even if the order slips.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 17 stats -->
+    <div class="cell">
+      <div class="cap"><b>17</b><span>Stats dashboard</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body scroll">
+          <div class="h" style="margin-bottom:14px">Your progress</div>
+          <div class="statg">
+            <div class="stat inv"><div class="n">14</div><div class="c">day streak</div></div>
+            <div class="stat"><div class="n">312</div><div class="c">words seen</div></div>
+            <div class="stat"><div class="n">78</div><div class="c">avg sound</div></div>
+            <div class="stat"><div class="n">91%</div><div class="c">retention</div></div>
+          </div>
+          <div class="panel"><h4>Pronunciation trend</h4><div class="pc">Last seven sessions</div>
+            <div class="bars"><div class="bar" style="height:52%"><span>52</span></div><div class="bar" style="height:58%"><span>58</span></div><div class="bar" style="height:55%"><span>55</span></div><div class="bar" style="height:64%"><span>64</span></div><div class="bar" style="height:70%"><span>70</span></div><div class="bar" style="height:74%"><span>74</span></div><div class="bar" style="height:78%"><span>78</span></div></div>
+          </div>
+          <div class="panel" style="margin-bottom:0"><h4>Sounds</h4><div class="pc">Strong and weak</div>
+            <div class="sounds"><span class="sp weak">stressed <b>о</b></span><span class="sp weak">soft <b>ль</b></span><span class="sp strong">rolled <b>р</b></span><span class="sp strong"><b>ж</b></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18 profile -->
+    <div class="cell">
+      <div class="cap"><b>18</b><span>Profile and settings</span></div>
+      <div class="phone"><div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>100 <i></i><i></i><i></i></span></div>
+        <div class="body scroll">
+          <div style="display:flex;align-items:center;gap:12px;margin:4px 0 16px">
+            <div class="ava" style="width:52px;height:52px;font-size:20px">Т</div>
+            <div><div style="font-family:Unbounded;font-weight:800;font-size:17px">Tom</div><div class="sub" style="margin:0">14 day streak · level A2</div></div>
+          </div>
+          <div class="srow">Native voice<span class="tile" style="box-shadow:none">female</span></div>
+          <div class="srow">Show transliteration<span class="toggle"></span></div>
+          <div class="srow">Daily reminder, 8pm<span class="toggle on"></span></div>
+          <div class="srow">Pronunciation scoring<span class="toggle on"></span></div>
+          <div class="srow">Playback speed<span class="tile" style="box-shadow:none">0.8x</span></div>
+          <div class="grammar" style="margin-top:6px"><h4>Note</h4><p>Transliteration is off. You are reading Cyrillic directly now.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="footnote">All 18 screens share one system: ink on cream paper, ben-day halftone, 3px outlines with hard offset shadows, inversion in place of colour. Copy stays sentence case, British spelling, no exclamation marks. This is the surface, <b>not the build</b>; it maps onto the V1 and V2 tiers in the brief, with conversation role-play and per-phoneme scoring sitting in V2.</p>
+
+</body>
+</html>

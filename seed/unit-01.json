@@ -1,0 +1,144 @@
+{
+  "note": "Seeded unit 1 so the app has real content on day one. Two lessons fully filled in the lesson schema shape. Stress marked where it is not obvious. Generation produces the rest of the spine.",
+  "unit": {
+    "position": 1,
+    "title": "First words",
+    "domain": "greetings",
+    "level": "A1",
+    "summary": "Say hello and goodbye, please and thank you, yes and no."
+  },
+  "lessons": [
+    {
+      "position": 1,
+      "title": "Hello and goodbye",
+      "scenario": "Greeting someone and saying goodbye.",
+      "level": "A1",
+      "grammar_focus": {
+        "title": "Formal and informal",
+        "note": "Russian splits formal and informal. Здравствуйте and до свидания are the safe, polite forms for anyone. Привет and пока are for friends and family. Start with the polite forms and use the casual ones once you know the person."
+      },
+      "phrases": [
+        {
+          "cyrillic": "Приве́т",
+          "transliteration": "pri-vyet",
+          "gloss": "hi, informal",
+          "grammar_note": "Used with people you know well.",
+          "target_phonemes": ["soft в", "stressed е"],
+          "new_vocabulary": [
+            { "lemma": "привет", "gloss": "hi", "part_of_speech": "interjection", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "Здра́вствуйте",
+          "transliteration": "zdra-stvuy-tye",
+          "gloss": "hello, formal",
+          "grammar_note": "The first в is silent. A polite hello for anyone.",
+          "target_phonemes": ["consonant cluster здр"],
+          "new_vocabulary": [
+            { "lemma": "здравствуйте", "gloss": "hello, formal", "part_of_speech": "interjection", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "Пока́",
+          "transliteration": "pa-ka",
+          "gloss": "bye, informal",
+          "grammar_note": "Casual goodbye. Note the o reduces to an a sound, it is not stressed.",
+          "target_phonemes": ["unstressed о"],
+          "new_vocabulary": [
+            { "lemma": "пока", "gloss": "bye", "part_of_speech": "interjection", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "До свида́ния",
+          "transliteration": "da svi-da-ni-ya",
+          "gloss": "goodbye, formal",
+          "grammar_note": "Literally until a meeting. The polite goodbye.",
+          "target_phonemes": ["soft н", "stressed а"],
+          "new_vocabulary": [
+            { "lemma": "до свидания", "gloss": "goodbye", "part_of_speech": "phrase", "gender": null }
+          ]
+        }
+      ],
+      "comprehension": [
+        {
+          "audio_phrase": "Здра́вствуйте",
+          "prompt": "What did you hear?",
+          "options": ["bye, informal", "hello, formal", "thank you"],
+          "answer_index": 1
+        },
+        {
+          "audio_phrase": "Пока́",
+          "prompt": "What did you hear?",
+          "options": ["hi, informal", "goodbye, formal", "bye, informal"],
+          "answer_index": 2
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "title": "Please and thank you",
+      "scenario": "The small words that carry every exchange.",
+      "level": "A1",
+      "grammar_focus": {
+        "title": "One word, two jobs",
+        "note": "Пожалуйста means both please and you are welcome, depending on where it sits. Ask with it before a request, reply with it after a thank you. The л is barely sounded, say pa-zha-lsta."
+      },
+      "phrases": [
+        {
+          "cyrillic": "Спаси́бо",
+          "transliteration": "spa-si-ba",
+          "gloss": "thank you",
+          "grammar_note": "The final o reduces to an a sound.",
+          "target_phonemes": ["unstressed о"],
+          "new_vocabulary": [
+            { "lemma": "спасибо", "gloss": "thank you", "part_of_speech": "interjection", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "Пожа́луйста",
+          "transliteration": "pa-zha-lsta",
+          "gloss": "please, or you are welcome",
+          "grammar_note": "Said quickly, the middle collapses. One word for both please and you are welcome.",
+          "target_phonemes": ["ж", "reduced луй"],
+          "new_vocabulary": [
+            { "lemma": "пожалуйста", "gloss": "please", "part_of_speech": "adverb", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "Да",
+          "transliteration": "da",
+          "gloss": "yes",
+          "grammar_note": null,
+          "target_phonemes": ["а"],
+          "new_vocabulary": [
+            { "lemma": "да", "gloss": "yes", "part_of_speech": "particle", "gender": null }
+          ]
+        },
+        {
+          "cyrillic": "Нет",
+          "transliteration": "nyet",
+          "gloss": "no",
+          "grammar_note": "The н is soft before е.",
+          "target_phonemes": ["soft н"],
+          "new_vocabulary": [
+            { "lemma": "нет", "gloss": "no", "part_of_speech": "particle", "gender": null }
+          ]
+        }
+      ],
+      "comprehension": [
+        {
+          "audio_phrase": "Спаси́бо",
+          "prompt": "What did you hear?",
+          "options": ["please", "thank you", "no"],
+          "answer_index": 1
+        },
+        {
+          "audio_phrase": "Пожа́луйста",
+          "prompt": "What did you hear?",
+          "options": ["please, or you are welcome", "yes", "goodbye"],
+          "answer_index": 0
+        }
+      ]
+    }
+  ]
+}
