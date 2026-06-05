@@ -222,3 +222,24 @@ create index on russ_scores (recording_id);
 create index on russ_comprehension_attempts (owner);
 create index on russ_comprehension_attempts (lesson_id);
 create index on russ_sessions (lesson_id);
+
+-- spaced repetition cards over the static curriculum, holds word and FSRS state
+create table russ_review_cards (
+  id uuid primary key default gen_random_uuid(),
+  owner uuid not null references auth.users on delete cascade,
+  ru text not null,
+  en text not null,
+  translit text,
+  stability numeric not null default 0,
+  difficulty numeric not null default 0,
+  reps int not null default 0,
+  lapses int not null default 0,
+  due_at timestamptz not null default now(),
+  last_reviewed timestamptz,
+  created_at timestamptz not null default now(),
+  unique (owner, ru)
+);
+alter table russ_review_cards enable row level security;
+create policy "own review_cards" on russ_review_cards
+  for all using ((select auth.uid()) = owner) with check ((select auth.uid()) = owner);
+create index on russ_review_cards (owner, due_at);

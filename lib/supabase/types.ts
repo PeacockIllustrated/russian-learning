@@ -130,6 +130,12 @@ export type Database = {
         Update: { owner?: string; unit_position?: number; lesson_position?: number; score?: number | null; completed_at?: string };
         Relationships: [];
       };
+      russ_review_cards: {
+        Row: { id: string; owner: string; ru: string; en: string; translit: string | null; stability: number; difficulty: number; reps: number; lapses: number; due_at: string; last_reviewed: string | null; created_at: string };
+        Insert: { id?: string; owner: string; ru: string; en: string; translit?: string | null; stability?: number; difficulty?: number; reps?: number; lapses?: number; due_at?: string; last_reviewed?: string | null; created_at?: string };
+        Update: { id?: string; owner?: string; ru?: string; en?: string; translit?: string | null; stability?: number; difficulty?: number; reps?: number; lapses?: number; due_at?: string; last_reviewed?: string | null; created_at?: string };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

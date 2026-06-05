@@ -6,13 +6,11 @@ import { cn } from "@/lib/utils/cn";
 
 type Item = { key: string; label: string; href: string | null };
 
-// journey and alphabet are wired this phase; practice and stats render but stay
-// inert until their phases land
 const items: Item[] = [
   { key: "journey", label: "Journey", href: "/journey" },
   { key: "practice", label: "Practice", href: "/practice" },
   { key: "alphabet", label: "Alphabet", href: "/alphabet" },
-  { key: "stats", label: "Stats", href: null },
+  { key: "stats", label: "Stats", href: "/stats" },
 ];
 
 function NavIcon({ name, className }: { name: string; className?: string }) {

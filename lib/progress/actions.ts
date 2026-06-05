@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getLesson } from "@/content/curriculum";
+import { newCard, review, type ReviewGrade } from "@/lib/srs";
 
 function isoDate(d: Date) {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD
@@ -47,6 +49,28 @@ export async function saveLessonProgress(
       .upsert({ id: user.id, streak_days: streak, last_active: today }, { onConflict: "id" });
   }
 
+  // turn the lesson's phrases into review cards, keeping any existing schedule
+  const found = getLesson(unitPosition, lessonPosition);
+  if (found && found.lesson.phrases.length) {
+    const now = new Date();
+    const cards = found.lesson.phrases.map((p) => {
+      const c = newCard(now);
+      return {
+        owner: user.id,
+        ru: p.cyrillic,
+        en: p.gloss,
+        translit: p.translit,
+        stability: c.stability,
+        difficulty: c.difficulty,
+        reps: c.reps,
+        lapses: c.lapses,
+        due_at: c.due_at,
+        last_reviewed: c.last_reviewed,
+      };
+    });
+    await supabase.from("russ_review_cards").upsert(cards, { onConflict: "owner,ru", ignoreDuplicates: true });
+  }
+
   revalidatePath("/journey");
   return { saved: true, streak };
 }
@@ -65,3 +89,48 @@ export async function reactivateLetter(glyph: string): Promise<{ saved: boolean 
   );
   return { saved: true };
 }
+
+// grades a due review card and reschedules it through FSRS. no-op when signed out.
+export async function gradeCard(cardId: string, grade: ReviewGrade): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+
+  const { data: card } = await supabase
+    .from("russ_review_cards")
+    .select("*")
+    .eq("id", cardId)
+    .eq("owner", user.id)
+    .single();
+  if (!card) return { ok: false };
+
+  const next = review(
+    {
+      stability: card.stability,
+      difficulty: card.difficulty,
+      reps: card.reps,
+      lapses: card.lapses,
+      due_at: card.due_at,
+      last_reviewed: card.last_reviewed,
+    },
+    grade,
+  );
+
+  await supabase
+    .from("russ_review_cards")
+    .update({
+      stability: next.stability,
+      difficulty: next.difficulty,
+      reps: next.reps,
+      lapses: next.lapses,
+      due_at: next.due_at,
+      last_reviewed: next.last_reviewed,
+    })
+    .eq("id", cardId)
+    .eq("owner", user.id);
+
+  return { ok: true };
+}
+
