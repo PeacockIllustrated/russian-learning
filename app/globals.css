@@ -43,6 +43,22 @@
   animation: pop-ring 0.9s ease-out forwards;
 }
 
+/* sustained sonar pulse behind the mic while it is live, the one pop moment here */
+@keyframes mic-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+.animate-mic-pulse {
+  animation: mic-pulse 1.4s ease-out infinite;
+}
+
 /* flashcard flip, front to back, from the alphabet mockup */
 .flip-card {
   perspective: 1000px;
@@ -73,4 +89,17 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/*
+  Hold the fixed top bar and bottom nav clear of the device safe areas. The
+  viewport is set to cover, so content runs edge to edge under the notch and the
+  home indicator; these add the inset on top of the resting padding so the nav
+  never sits under the home indicator or gets clipped.
+*/
+.pt-safe {
+  padding-top: calc(env(safe-area-inset-top) + 1rem);
+}
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
 }

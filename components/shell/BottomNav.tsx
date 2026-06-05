@@ -57,7 +57,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex shrink-0 justify-around border-t-[3px] border-ink bg-paper px-1.5 pb-3 pt-2.5">
+    <nav className="pb-safe flex shrink-0 justify-around border-t-[3px] border-ink bg-paper px-1.5 pt-2.5">
       {items.map((it) => {
         const current = it.href ? pathname.startsWith(it.href) : false;
         const inner = (

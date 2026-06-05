@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { speak } from "@/lib/audio/tts";
+import { useSpeechRecognition } from "@/lib/speech/useSpeechRecognition";
 import type { Scenario, ChatLine } from "@/content/scenarios";
 
 type Msg = { role: "you" | "them"; ru: string; en: string; suggestions?: ChatLine[] };
@@ -15,6 +16,13 @@ export function ChatRoom({ scenario, onBack }: { scenario: Scenario; onBack: () 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const {
+    supported: micSupported,
+    listening,
+    error: micError,
+    start,
+    stop,
+  } = useSpeechRecognition({ onResult: (text) => setInput(text) });
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -97,6 +105,9 @@ export function ChatRoom({ scenario, onBack }: { scenario: Scenario; onBack: () 
             ))}
           </div>
         ) : null}
+        {micSupported && micError ? (
+          <p className="mb-2 text-[11px] font-medium text-greyish">{micHint(micError)}</p>
+        ) : null}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -104,10 +115,44 @@ export function ChatRoom({ scenario, onBack }: { scenario: Scenario; onBack: () 
           }}
           className="flex items-center gap-2"
         >
+          {micSupported ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (listening) {
+                  stop();
+                } else {
+                  setInput("");
+                  start();
+                }
+              }}
+              aria-label={listening ? "Stop voice input" : "Speak in Russian"}
+              aria-pressed={listening}
+              className={cn(
+                "relative grid h-11 w-11 shrink-0 place-items-center rounded-full border-[3px] border-ink shadow-comic-sm transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+                listening ? "bg-pop text-paper" : "bg-paper text-ink",
+              )}
+            >
+              {listening ? (
+                <span className="pointer-events-none absolute -inset-1 animate-mic-pulse rounded-full bg-pop" />
+              ) : null}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="relative z-10 h-5 w-5"
+              >
+                <path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM6 12a6 6 0 0012 0M12 18v3" />
+              </svg>
+            </button>
+          ) : null}
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Say something in Russian"
+            placeholder={listening ? "Listening" : "Say something in Russian"}
             aria-label="Your message"
             className="flex-1 rounded-tag border-[3px] border-ink bg-paper px-3.5 py-2.5 text-sm font-semibold outline-none focus:bg-paper2"
           />
@@ -180,4 +225,12 @@ function ErrorNote({ kind }: { kind: string }) {
         : "The reply did not come through. Try again."}
     </div>
   );
+}
+
+function micHint(error: string): string {
+  if (error === "not-allowed" || error === "service-not-allowed")
+    return "Microphone access is off. Allow it in your browser to speak.";
+  if (error === "no-speech") return "Did not catch that. Tap the mic and try again.";
+  if (error === "audio-capture") return "No microphone found.";
+  return "Voice input did not work. Try again.";
 }

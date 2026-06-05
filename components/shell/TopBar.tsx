@@ -22,7 +22,7 @@ export function TopBar({
   signedIn?: boolean;
 }) {
   return (
-    <header className="flex shrink-0 items-center justify-between px-4 pb-3 pt-4">
+    <header className="pt-safe flex shrink-0 items-center justify-between px-4 pb-3">
       <div>
         <div className="font-display text-[13px] font-extrabold leading-none">Unit {unitPosition}</div>
         <div className="mt-1 text-[10px] font-medium uppercase tracking-[1px] text-greyish">{unitTitle}</div>
